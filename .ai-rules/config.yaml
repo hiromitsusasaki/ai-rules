@@ -1,0 +1,18 @@
+mode: project
+source: project.md
+targets:
+  enabled:
+    - claude-code
+    - codex
+    - copilot
+    - gemini
+    - cursor
+install:
+  mode: copy
+  on_conflict: overwrite
+  destinations:
+    claude-code: "./CLAUDE.md"
+    codex: "./AGENTS.md"
+    copilot: ".github/copilot-instructions.md"
+    gemini: "./GEMINI.md"
+    cursor: ".cursor/rules/ai-rules.mdc"
