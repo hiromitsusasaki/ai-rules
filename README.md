@@ -39,8 +39,11 @@ ai-rules propose --last
 
 # 3. Review proposals/<id>/summary.md and patch.diff, then apply manually
 
-# 4. Build target files
+# 4. Build target files (default: claude-code, codex only)
 ai-rules build
+
+# or build all enabled targets
+ai-rules build --all
 
 # 5. Install to each tool's config location
 ai-rules install
@@ -60,7 +63,7 @@ ai-rules doctor
 | `ai-rules ingest --file <path>` | Ingest from file |
 | `ai-rules propose --last` | Create proposal from latest inbox item |
 | `ai-rules approve --last` | Approve latest proposal (project mode) |
-| `ai-rules build` | Render atoms into target-specific files in `dist/` |
+| `ai-rules build [--all \| --targets <t1,t2,...>]` | Render atoms into target-specific files in `dist/` |
 | `ai-rules install` | Deploy dist files to each tool's config path |
 | `ai-rules configure` | Set OpenAI API key |
 | `ai-rules doctor` | Check YAML schema, broken links, and config health |
@@ -70,6 +73,54 @@ ai-rules doctor
 
 ```
 ingest → distill → reconcile → patch → build → install
+```
+
+```mermaid
+flowchart LR
+    subgraph Sources
+        URL([URL])
+        Text([Text / File])
+        Stdin([stdin])
+    end
+
+    subgraph "Propose & Review"
+        Inbox[inbox/*.md]
+        Distill[Distill]
+        Reconcile[Reconcile]
+        Patch[Patch]
+        Proposal[proposals/&lt;id&gt;/]
+        Review{Human Review}
+    end
+
+    subgraph SSOT
+        Atoms[(atoms/*.yaml)]
+    end
+
+    subgraph "Build & Install"
+        Build[Build]
+        Dist[dist/&lt;target&gt;/]
+        Install[Install]
+    end
+
+    subgraph Targets
+        CC[Claude Code<br/>CLAUDE.md]
+        CX[Codex<br/>AGENTS.md]
+        CP[Copilot<br/>copilot-instructions.md]
+        GM[Gemini<br/>GEMINI.md]
+        CR[Cursor<br/>ai-rules.mdc]
+        OC[OpenClaw<br/>SKILL.md]
+        CH[Chat<br/>custom_instructions.txt]
+    end
+
+    URL --> Inbox
+    Text --> Inbox
+    Stdin --> Inbox
+    Inbox --> Distill --> Reconcile --> Patch --> Proposal
+    Proposal --> Review -->|approve| Atoms
+    Review -->|reject| Proposal
+
+    Atoms --> Build --> Dist --> Install
+    Install --> CC & CX & CP & GM & CR & OC & CH
 ```
 
 1. **Ingest** -- URL / text / stdin / file are normalized into `inbox/*.md` with frontmatter

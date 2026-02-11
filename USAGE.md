@@ -87,10 +87,25 @@ node ./bin/ai-rules propose inbox/20260208_105950_text_xxxxxxxx.md
 ### build（生成）
 
 ```bash
+# デフォルト: claude-code, codex のみビルド
 node ./bin/ai-rules build
+
+# config の enabled 全ターゲットをビルド
+node ./bin/ai-rules build --all
+
+# カンマ区切りでターゲット指定
+node ./bin/ai-rules build --targets gemini,cursor
 ```
 
 `atoms/` から各ターゲット向け生成物を `dist/` に出力します。
+
+| オプション | 動作 |
+|-----------|------|
+| (なし) | `claude-code`, `codex` のみビルド（config の enabled との交差） |
+| `--all` | config の enabled 全ターゲットをビルド |
+| `--targets <t1,t2,...>` | 指定ターゲットのみビルド（config の enabled との交差） |
+
+config の `targets.enabled` に含まれないターゲットを指定した場合は警告を出してスキップします。
 
 ### install（反映）
 
