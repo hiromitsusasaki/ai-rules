@@ -1,0 +1,22 @@
+# User data
+atoms/
+!atoms/schema.json
+inbox/
+proposals/
+dist/
+
+# Project-mode config
+.ai-rules/
+
+# Dev / editor
+.claude/
+.cursor/
+.github/
+node_modules/
+
+# Docs (not needed at runtime)
+docs/
+USAGE.md
+CLAUDE.md
+AGENTS.md
+GEMINI.md

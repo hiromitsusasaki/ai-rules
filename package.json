@@ -1,11 +1,36 @@
 {
-  "name": "ai-rules",
+  "name": "@hiromitsusasaki/ai-rules",
   "version": "0.1.0",
   "description": "Manage personal AI agent rules as SSOT and distribute to multiple AI tools",
   "type": "commonjs",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hiromitsusasaki/ai-rules.git"
+  },
+  "homepage": "https://github.com/hiromitsusasaki/ai-rules",
+  "keywords": [
+    "ai",
+    "rules",
+    "agent",
+    "claude",
+    "copilot",
+    "gemini",
+    "cursor",
+    "codex",
+    "cli"
+  ],
   "bin": {
     "ai-rules": "bin/ai-rules"
   },
+  "files": [
+    "bin/",
+    "src/",
+    "config/config.yaml",
+    "atoms/schema.json",
+    "LICENSE",
+    "README.md"
+  ],
   "scripts": {
     "ai-rules": "node ./bin/ai-rules",
     "status": "node ./bin/ai-rules status",
