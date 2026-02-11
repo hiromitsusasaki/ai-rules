@@ -1,0 +1,10 @@
+plan:
+  actions:
+    - type: "conflict"
+      candidate_id_hint: "thinking.avoid_use_in_operations_719adf"
+      conflicts_with_ids:
+        - "thinking.avoid_operational_usage"
+      note: "候補と既存ルールの極性が逆で衝突の可能性があります（similarity=0.58）。"
+meta:
+  must_additions_count: 0
+  must_additions_limit: 3

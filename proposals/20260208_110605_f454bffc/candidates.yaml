@@ -1,0 +1,26 @@
+source:
+  inbox_path: "inbox/20260208_105956_url_4d0a13af.md"
+  source_kind: "url"
+  source: "https://example.com"
+candidates:
+  - id_hint: "thinking.avoid_use_in_operations_719adf"
+    category: "thinking"
+    priority: "should"
+    text: "Avoid use in operations."
+    rationale: "入力文書で繰り返し現れる運用意図を規範として再利用するため。"
+    examples:
+      good:
+        []
+      bad:
+        []
+    sources:
+      - quote: "Avoid use in operations."
+        location_hint: "# Content"
+    status: "experimental"
+    review_after_days: 30
+meta:
+  dropped:
+    - reason: "規範文ではないため除外"
+      quote: "Example Domain This domain is for use in documentation examples without needing permission."
+    - reason: "規範文ではないため除外"
+      quote: "Learn more"

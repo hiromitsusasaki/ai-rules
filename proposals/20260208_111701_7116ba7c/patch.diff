@@ -1,0 +1,18 @@
+--- /dev/null
++++ b/atoms/thinking.avoid_use_in_operations_719adf.yaml
+@@ -0,0 +1,15 @@
++id: "thinking.avoid_use_in_operations_719adf"
++category: "thinking"
++priority: "should"
++text: "Avoid use in operations."
++rationale: "入力文書で繰り返し現れる運用意図を規範として再利用するため。"
++examples:
++  good:
++    []
++  bad:
++    []
++sources:
++  - path: "inbox/20260208_105956_url_4d0a13af.md"
++    quote: "Avoid use in operations."
++status: "experimental"
++review_after: "2026-03-10"

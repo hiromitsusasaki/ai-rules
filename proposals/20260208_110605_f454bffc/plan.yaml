@@ -1,0 +1,18 @@
+plan:
+  actions:
+    - type: "update_existing"
+      target_id: "thinking.avoid_operational_usage"
+      updates:
+        rationale_append: "入力文書で繰り返し現れる運用意図を規範として再利用するため。"
+        examples_append:
+          good:
+            []
+          bad:
+            []
+        sources_append:
+          - path: "inbox/20260208_105956_url_4d0a13af.md"
+            quote: "Avoid use in operations."
+      justification: "候補は既存ルールと近義（similarity=1.00）のため text は維持し、根拠と例を追記する。"
+meta:
+  must_additions_count: 0
+  must_additions_limit: 3

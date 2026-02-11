@@ -1,0 +1,16 @@
+--- a/atoms/update-test.yaml
++++ b/atoms/update-test.yaml
+@@ -1,5 +1,8 @@
+-id: thinking.avoid_operational_usage
+-category: thinking
+-priority: should
+-text: Avoid use in operations.
+-status: stable
++id: "thinking.avoid_operational_usage"
++category: "thinking"
++priority: "should"
++text: "Avoid use in operations."
++status: "stable"
++rationale: "入力文書で繰り返し現れる運用意図を規範として再利用するため。"
++sources:
++  - "inbox/20260208_105956_url_4d0a13af.md | Avoid use in operations."

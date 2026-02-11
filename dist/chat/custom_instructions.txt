@@ -1,0 +1,7 @@
+個人用AIルール（簡易版）
+
+最優先（must）
+- (none)
+
+推奨（should）
+- (none)

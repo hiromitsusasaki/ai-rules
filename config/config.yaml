@@ -1,0 +1,31 @@
+paths:
+  root: .
+  atoms: atoms
+  inbox: inbox
+  proposals: proposals
+  dist: dist
+propose:
+  max_must_additions: 3
+patch:
+  mode: diff
+targets:
+  enabled:
+    - chat
+    - claude-code
+    - codex
+    - copilot
+    - gemini
+    - opencode
+    - cursor
+    - openclaw
+install:
+  mode: symlink
+  on_conflict: backup
+  destinations:
+    chat: "~/.config/ai-rules/targets/chat/custom_instructions.txt"
+    claude-code: "~/.claude/CLAUDE.md"
+    codex: "~/.codex/AGENTS.md"
+    copilot: "~/.copilot/copilot-instructions.md"
+    gemini: "~/.gemini/GEMINI.md"
+    opencode: "~/.config/opencode/AGENTS.md"
+    openclaw: "~/.config/ai-rules/targets/openclaw/skills/personal-constitution/SKILL.md"
