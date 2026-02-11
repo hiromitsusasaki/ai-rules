@@ -64,6 +64,7 @@ async function initCommand(args) {
   await fs.writeFile(path.join(aiRulesDir, 'config.yaml'), DEFAULT_PROJECT_CONFIG, 'utf8');
 
   await appendToGitignore(projectRoot, '.ai-rules/dist/');
+  await appendToGitignore(projectRoot, '.ai-rules/backups/');
 
   console.log('[ai-rules] init completed');
   console.log(`- source: ${sourcePath}`);

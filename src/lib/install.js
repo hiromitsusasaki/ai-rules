@@ -75,7 +75,7 @@ function timestampForBackup() {
   return `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}${pad(d.getHours())}${pad(d.getMinutes())}${pad(d.getSeconds())}`;
 }
 
-async function ensureConflictHandled(destination, onConflict) {
+async function ensureConflictHandled(destination, onConflict, backupDir) {
   try {
     await fs.lstat(destination);
   } catch {
@@ -88,7 +88,14 @@ async function ensureConflictHandled(destination, onConflict) {
   }
 
   if (onConflict === 'backup') {
-    const backupPath = `${destination}.bak`;
+    const basename = path.basename(destination);
+    const ts = timestampForBackup();
+    const backupPath = backupDir
+      ? path.join(backupDir, `${basename}.${ts}.bak`)
+      : `${destination}.bak`;
+    if (backupDir) {
+      await fs.mkdir(backupDir, { recursive: true });
+    }
     await fs.rename(destination, backupPath);
     return { skipped: false, backupPath };
   }
@@ -96,8 +103,12 @@ async function ensureConflictHandled(destination, onConflict) {
   return { skipped: true, backupPath: '' };
 }
 
-async function installOne({ source, destination, mode, onConflict }) {
-  await fs.access(source);
+async function installOne({ source, destination, mode, onConflict, backupDir }) {
+  try {
+    await fs.access(source);
+  } catch {
+    return { status: 'skipped', reason: 'not-built', destination };
+  }
   await fs.mkdir(path.dirname(destination), { recursive: true });
 
   let existingLinkTarget = '';
@@ -114,7 +125,7 @@ async function installOne({ source, destination, mode, onConflict }) {
     // no-op
   }
 
-  const conflict = await ensureConflictHandled(destination, onConflict);
+  const conflict = await ensureConflictHandled(destination, onConflict, backupDir);
   if (conflict.skipped) {
     return { status: 'skipped', reason: 'conflict', destination };
   }

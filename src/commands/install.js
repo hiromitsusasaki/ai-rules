@@ -31,6 +31,7 @@ async function installGlobalMode() {
 }
 
 async function installProjectMode(projectRoot) {
+  const path = require('node:path');
   const projectConfig = await loadProjectConfig(projectRoot);
   if (!projectConfig) {
     throw new Error('.ai-rules/config.yaml が見つかりません。ai-rules init を実行してください。');
@@ -43,6 +44,7 @@ async function installProjectMode(projectRoot) {
   });
   const mode = projectConfig.install.mode;
   const onConflict = projectConfig.install.on_conflict;
+  const backupDir = path.join(projectRoot, '.ai-rules', 'backups');
 
   if (items.length === 0) {
     console.log('[ai-rules] install: 対象がありません');
@@ -53,10 +55,10 @@ async function installProjectMode(projectRoot) {
   console.log(`- mode: ${mode}`);
   console.log(`- on_conflict: ${onConflict}`);
 
-  await runInstall(items, mode, onConflict);
+  await runInstall(items, mode, onConflict, backupDir);
 }
 
-async function runInstall(items, mode, onConflict) {
+async function runInstall(items, mode, onConflict, backupDir) {
   let installed = 0;
   let skipped = 0;
   const backups = [];
@@ -67,6 +69,7 @@ async function runInstall(items, mode, onConflict) {
       destination: item.destination,
       mode,
       onConflict,
+      backupDir,
     });
 
     if (result.status === 'installed') {
