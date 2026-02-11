@@ -82,8 +82,13 @@ async function ensureConflictHandled(destination, onConflict) {
     return { skipped: false, backupPath: '' };
   }
 
+  if (onConflict === 'overwrite') {
+    await fs.rm(destination, { recursive: true, force: true });
+    return { skipped: false, backupPath: '' };
+  }
+
   if (onConflict === 'backup') {
-    const backupPath = `${destination}.bak.${timestampForBackup()}`;
+    const backupPath = `${destination}.bak`;
     await fs.rename(destination, backupPath);
     return { skipped: false, backupPath };
   }

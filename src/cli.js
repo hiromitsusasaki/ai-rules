@@ -5,6 +5,8 @@ const { installCommand } = require('./commands/install');
 const { initCommand } = require('./commands/init');
 const { statusCommand } = require('./commands/status');
 const { doctorCommand } = require('./commands/doctor');
+const { configureCommand } = require('./commands/configure');
+const { approveCommand } = require('./commands/approve');
 
 function printHelp() {
   console.log(`ai-rules commands:
@@ -14,8 +16,10 @@ function printHelp() {
   ai-rules ingest --text "<text>"
   ai-rules ingest --file <path>
   ai-rules propose <inbox_path> | ai-rules propose --last
+  ai-rules approve --last | ai-rules approve <proposal-id>
   ai-rules build
   ai-rules install
+  ai-rules configure
   ai-rules doctor
   ai-rules status`);
 }
@@ -60,6 +64,16 @@ async function runCli(args) {
 
   if (command === 'install') {
     await installCommand(rest);
+    return;
+  }
+
+  if (command === 'configure') {
+    await configureCommand(rest);
+    return;
+  }
+
+  if (command === 'approve') {
+    await approveCommand(rest);
     return;
   }
 

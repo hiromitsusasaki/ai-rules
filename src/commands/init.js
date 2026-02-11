@@ -1,5 +1,7 @@
 const fs = require('node:fs/promises');
 const path = require('node:path');
+const { resolveApiKey } = require('../lib/credentials');
+const { transformInit } = require('../lib/transform');
 
 const DEFAULT_PROJECT_CONFIG = `mode: project
 source: project.md
@@ -49,7 +51,16 @@ async function initCommand(args) {
 
   await fs.mkdir(aiRulesDir, { recursive: true });
 
-  await fs.writeFile(path.join(aiRulesDir, 'project.md'), sourceContent, 'utf8');
+  let projectContent = sourceContent;
+  const apiKey = resolveApiKey();
+  if (apiKey) {
+    console.log('[ai-rules] LLM で汎用ルール文書に変換中...');
+    projectContent = await transformInit(sourceContent);
+  } else {
+    console.log('[ai-rules] API キー未設定のため、ソースをそのままコピーします。');
+  }
+
+  await fs.writeFile(path.join(aiRulesDir, 'project.md'), projectContent, 'utf8');
   await fs.writeFile(path.join(aiRulesDir, 'config.yaml'), DEFAULT_PROJECT_CONFIG, 'utf8');
 
   await appendToGitignore(projectRoot, '.ai-rules/dist/');

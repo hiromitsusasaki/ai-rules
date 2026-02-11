@@ -1,7 +1,8 @@
 const { loadAtoms, validateAtoms } = require('../lib/atoms');
 const { loadConfig, loadProjectConfig } = require('../lib/config');
-const { buildTargets, buildProjectTargets } = require('../lib/build');
+const { buildTargets, buildProjectTargets, buildProjectTargetsWithLLM } = require('../lib/build');
 const { detectMode } = require('../lib/paths');
+const { resolveApiKey } = require('../lib/credentials');
 
 async function buildCommand() {
   const mode = detectMode();
@@ -48,7 +49,14 @@ async function buildProjectMode(projectRoot) {
     throw new Error('.ai-rules/config.yaml が見つかりません。ai-rules init を実行してください。');
   }
 
-  const result = await buildProjectTargets({
+  const apiKey = resolveApiKey();
+  const buildFn = apiKey ? buildProjectTargetsWithLLM : buildProjectTargets;
+
+  if (apiKey) {
+    console.log('[ai-rules] LLM でターゲット別に最適化中...');
+  }
+
+  const result = await buildFn({
     projectRoot,
     source: projectConfig.source,
     enabledTargets: projectConfig.targets.enabled,

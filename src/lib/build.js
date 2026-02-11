@@ -1,6 +1,7 @@
 const fs = require('node:fs/promises');
 const path = require('node:path');
 const { pathInProject } = require('./paths');
+const { transformForTarget } = require('./transform');
 
 const CATEGORY_ORDER = ['style', 'format', 'thinking', 'research'];
 const PRIORITY_ORDER = ['must', 'should', 'may'];
@@ -264,8 +265,35 @@ async function buildProjectTargets({ projectRoot, source, enabledTargets }) {
   return { outputs };
 }
 
+async function buildProjectTargetsWithLLM({ projectRoot, source, enabledTargets }) {
+  const sourcePath = path.join(projectRoot, '.ai-rules', source);
+  const content = await fs.readFile(sourcePath, 'utf8');
+  const distBase = path.join(projectRoot, '.ai-rules', 'dist');
+  const outputs = [];
+
+  for (const target of enabledTargets) {
+    const distRelPath = TARGET_DIST_MAP[target];
+    if (!distRelPath) {
+      continue;
+    }
+
+    const llmResult = await transformForTarget(content, target);
+    const rendered = llmResult !== null
+      ? llmResult
+      : renderProjectTarget(target, content);
+
+    const abs = path.join(distBase, distRelPath.replace(/^dist\//, ''));
+    await fs.mkdir(path.dirname(abs), { recursive: true });
+    await fs.writeFile(abs, rendered, 'utf8');
+    outputs.push(abs);
+  }
+
+  return { outputs };
+}
+
 module.exports = {
   buildTargets,
   buildProjectTargets,
+  buildProjectTargetsWithLLM,
   TARGET_DIST_MAP,
 };

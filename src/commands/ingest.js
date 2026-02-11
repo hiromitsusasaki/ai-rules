@@ -2,8 +2,10 @@ const fs = require('node:fs/promises');
 const path = require('node:path');
 const crypto = require('node:crypto');
 const { toFrontmatter } = require('../lib/frontmatter');
-const { pathInProject } = require('../lib/paths');
+const { pathInProject, detectMode } = require('../lib/paths');
 const { extractHtmlMeta, normalizeWhitespace } = require('../lib/text');
+const { resolveApiKey } = require('../lib/credentials');
+const { transformIngestMerge } = require('../lib/transform');
 
 function parseIngestArgs(args) {
   const parsed = {
@@ -186,6 +188,39 @@ async function ingestCommand(args) {
   await fs.writeFile(outPath, markdown, 'utf8');
 
   console.log(`[ai-rules] saved: ${outPath}`);
+
+  const mode = detectMode();
+  const apiKey = resolveApiKey();
+
+  if (mode.type === 'project' && apiKey) {
+    const projectMdPath = path.join(mode.root, '.ai-rules', 'project.md');
+    let projectContent;
+    try {
+      projectContent = await fs.readFile(projectMdPath, 'utf8');
+    } catch {
+      projectContent = null;
+    }
+
+    if (projectContent !== null) {
+      console.log('[ai-rules] LLM でマージ提案を生成中...');
+      try {
+        const proposed = await transformIngestMerge(projectContent, metadata.content, {
+          source: metadata.source,
+          source_kind: metadata.source_kind,
+        });
+
+        const proposalId = timestampForFile();
+        const proposalDir = path.join(mode.root, '.ai-rules', 'proposals', proposalId);
+        await fs.mkdir(proposalDir, { recursive: true });
+        await fs.writeFile(path.join(proposalDir, 'proposed-project.md'), proposed, 'utf8');
+
+        console.log(`[ai-rules] マージ提案を保存しました: .ai-rules/proposals/${proposalId}/`);
+        console.log('[ai-rules] 承認するには: ai-rules approve --last');
+      } catch (err) {
+        console.error(`[ai-rules] WARN: マージ提案の生成に失敗しました: ${err.message}`);
+      }
+    }
+  }
 }
 
 module.exports = {

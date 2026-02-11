@@ -2,6 +2,9 @@ const fs = require('node:fs/promises');
 const { pathInProject } = require('./paths');
 
 const DEFAULT_CONFIG = {
+  llm: {
+    model: 'gpt-4.1-mini',
+  },
   propose: {
     max_must_additions: 3,
   },
@@ -39,6 +42,7 @@ function parseConfig(raw) {
   let subSection = '';
   let inTargetsEnabled = false;
 
+  let llmModel = DEFAULT_CONFIG.llm.model;
   let maxMust = DEFAULT_CONFIG.propose.max_must_additions;
   let patchMode = DEFAULT_CONFIG.patch.mode;
   let installMode = DEFAULT_CONFIG.install.mode;
@@ -58,6 +62,17 @@ function parseConfig(raw) {
       subSection = '';
       inTargetsEnabled = false;
       continue;
+    }
+
+    if (section === 'llm') {
+      const m = trimmed.match(/^model:\s*(.+)\s*$/);
+      if (m) {
+        let val = m[1];
+        if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
+          val = val.slice(1, -1);
+        }
+        llmModel = val;
+      }
     }
 
     if (section === 'propose') {
@@ -126,6 +141,9 @@ function parseConfig(raw) {
   }
 
   return {
+    llm: {
+      model: llmModel || DEFAULT_CONFIG.llm.model,
+    },
     propose: {
       max_must_additions: Number.isFinite(maxMust) ? maxMust : DEFAULT_CONFIG.propose.max_must_additions,
     },
