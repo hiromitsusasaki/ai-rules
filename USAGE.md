@@ -98,7 +98,17 @@ node ./bin/ai-rules build
 node ./bin/ai-rules install
 ```
 
-`config/config.yaml` の `install_destinations` に従って配備します。
+`config/config.yaml`（グローバル）または `.ai-rules/config.yaml`（プロジェクト）の設定に従って配備します。
+
+`on_conflict` オプションで既存ファイルとの競合時の挙動を制御できます:
+
+| 値 | 動作 |
+|----|------|
+| `backup` | 既存ファイルを `<path>.bak` にリネーム（最新1世代のみ保持） |
+| `overwrite` | 既存ファイルを削除して上書き（バックアップなし） |
+| `skip` | 既存ファイルをそのまま残す |
+
+git 管理下のプロジェクトディレクトリでは `overwrite` 推奨です（バージョン履歴がバックアップの役割を果たすため）。
 
 ### status / doctor（確認）
 

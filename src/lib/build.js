@@ -291,9 +291,12 @@ async function buildProjectTargetsWithLLM({ projectRoot, source, enabledTargets 
   return { outputs };
 }
 
+const DEFAULT_BUILD_TARGETS = ['claude-code', 'codex'];
+
 module.exports = {
   buildTargets,
   buildProjectTargets,
   buildProjectTargetsWithLLM,
   TARGET_DIST_MAP,
+  DEFAULT_BUILD_TARGETS,
 };

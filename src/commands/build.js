@@ -1,20 +1,57 @@
 const { loadAtoms, validateAtoms } = require('../lib/atoms');
 const { loadConfig, loadProjectConfig } = require('../lib/config');
-const { buildTargets, buildProjectTargets, buildProjectTargetsWithLLM } = require('../lib/build');
+const { buildTargets, buildProjectTargets, buildProjectTargetsWithLLM, DEFAULT_BUILD_TARGETS } = require('../lib/build');
 const { detectMode } = require('../lib/paths');
 const { resolveApiKey } = require('../lib/credentials');
 
-async function buildCommand() {
+function parseBuildArgs(args) {
+  if (!args || args.length === 0) {
+    return { mode: 'default' };
+  }
+
+  for (let i = 0; i < args.length; i++) {
+    if (args[i] === '--all') {
+      return { mode: 'all' };
+    }
+    if (args[i] === '--targets' && i + 1 < args.length) {
+      const targets = args[i + 1].split(',').map((t) => t.trim()).filter(Boolean);
+      return { mode: 'targets', targets };
+    }
+  }
+
+  return { mode: 'default' };
+}
+
+function filterTargets(enabledTargets, buildArgs) {
+  if (buildArgs.mode === 'all') {
+    return enabledTargets;
+  }
+
+  const requested = buildArgs.mode === 'targets'
+    ? buildArgs.targets
+    : DEFAULT_BUILD_TARGETS;
+
+  const filtered = requested.filter((t) => enabledTargets.includes(t));
+  const skipped = requested.filter((t) => !enabledTargets.includes(t));
+
+  for (const t of skipped) {
+    console.log(`[ai-rules] WARN: target "${t}" is not in enabled targets, skipping`);
+  }
+
+  return filtered;
+}
+
+async function buildCommand(args) {
   const mode = detectMode();
 
   if (mode.type === 'project') {
-    await buildProjectMode(mode.root);
+    await buildProjectMode(mode.root, args);
   } else {
-    await buildGlobalMode();
+    await buildGlobalMode(args);
   }
 }
 
-async function buildGlobalMode() {
+async function buildGlobalMode(args) {
   const config = await loadConfig();
   const { atoms, parseErrors } = await loadAtoms();
   if (parseErrors.length > 0) {
@@ -26,14 +63,17 @@ async function buildGlobalMode() {
     throw new Error(`atoms の検証エラー: ${validation.errors.join('; ')}`);
   }
 
+  const buildArgs = parseBuildArgs(args);
+  const enabledTargets = filterTargets(config.targets.enabled, buildArgs);
+
   const result = await buildTargets({
     atomsWithFile: atoms,
-    enabledTargets: config.targets.enabled,
+    enabledTargets,
   });
 
   console.log('[ai-rules] build completed (global)');
   console.log(`- atoms: ${result.atomsCount}`);
-  console.log(`- targets: ${config.targets.enabled.join(', ')}`);
+  console.log(`- targets: ${enabledTargets.join(', ')}`);
   for (const out of result.outputs) {
     console.log(`- output: ${out}`);
   }
@@ -43,11 +83,14 @@ async function buildGlobalMode() {
   }
 }
 
-async function buildProjectMode(projectRoot) {
+async function buildProjectMode(projectRoot, args) {
   const projectConfig = await loadProjectConfig(projectRoot);
   if (!projectConfig) {
     throw new Error('.ai-rules/config.yaml が見つかりません。ai-rules init を実行してください。');
   }
+
+  const buildArgs = parseBuildArgs(args);
+  const enabledTargets = filterTargets(projectConfig.targets.enabled, buildArgs);
 
   const apiKey = resolveApiKey();
   const buildFn = apiKey ? buildProjectTargetsWithLLM : buildProjectTargets;
@@ -59,12 +102,12 @@ async function buildProjectMode(projectRoot) {
   const result = await buildFn({
     projectRoot,
     source: projectConfig.source,
-    enabledTargets: projectConfig.targets.enabled,
+    enabledTargets,
   });
 
   console.log('[ai-rules] build completed (project)');
   console.log(`- source: ${projectConfig.source}`);
-  console.log(`- targets: ${projectConfig.targets.enabled.join(', ')}`);
+  console.log(`- targets: ${enabledTargets.join(', ')}`);
   for (const out of result.outputs) {
     console.log(`- output: ${out}`);
   }
@@ -72,4 +115,6 @@ async function buildProjectMode(projectRoot) {
 
 module.exports = {
   buildCommand,
+  parseBuildArgs,
+  filterTargets,
 };

@@ -17,7 +17,7 @@ function printHelp() {
   ai-rules ingest --file <path>
   ai-rules propose <inbox_path> | ai-rules propose --last
   ai-rules approve --last | ai-rules approve <proposal-id>
-  ai-rules build
+  ai-rules build [--all | --targets <t1,t2,...>]
   ai-rules install
   ai-rules configure
   ai-rules doctor

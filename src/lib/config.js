@@ -109,7 +109,7 @@ function parseConfig(raw) {
       if (mode) {
         installMode = mode[1];
       }
-      const conflict = trimmed.match(/^on_conflict:\s*(error|backup)\s*$/);
+      const conflict = trimmed.match(/^on_conflict:\s*(error|backup|overwrite|skip)\s*$/);
       if (conflict) {
         onConflict = conflict[1];
       }
@@ -155,7 +155,7 @@ function parseConfig(raw) {
     },
     install: {
       mode: installMode === 'copy' ? 'copy' : 'symlink',
-      on_conflict: onConflict === 'backup' ? 'backup' : 'error',
+      on_conflict: ['backup', 'overwrite', 'skip'].includes(onConflict) ? onConflict : 'backup',
       destinations: {
         ...DEFAULT_CONFIG.install.destinations,
         ...destinations,
@@ -255,7 +255,7 @@ function parseProjectConfig(raw) {
       if (mode) {
         installMode = mode[1];
       }
-      const conflict = trimmed.match(/^on_conflict:\s*(error|backup)\s*$/);
+      const conflict = trimmed.match(/^on_conflict:\s*(error|backup|overwrite|skip)\s*$/);
       if (conflict) {
         onConflict = conflict[1];
       }
