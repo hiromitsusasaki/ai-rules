@@ -1,6 +1,6 @@
 {
   "name": "@hiromitsusasaki/ai-rules",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Manage personal AI agent rules as SSOT and distribute to multiple AI tools",
   "type": "commonjs",
   "license": "MIT",
